@@ -14,7 +14,7 @@ SINCE="--data-urlencode since=2014-02-10T17:00Z"
 UNTIL="--data-urlencode until=2014-02-17T10:00Z"
 SORT="--data-urlencode sort_by=incident_number:desc"
 
-OFFSET="--data-urlencode offset=100"
+OFFSET="--data-urlencode offset=0"
 LIMIT="--data-urlencode limit=100"
 
 FIELD="--data-urlencode fields=incident_number,created_on,status,assigned_to_user,id,trigger_summary_data"

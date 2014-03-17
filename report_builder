@@ -24,6 +24,7 @@ echo "ACTION" $ACTION
 echo "SUBACTION" $SUBACTION
 
 ###########################################
+
 # set some variables
 source common_variables
 
