@@ -1,0 +1,22 @@
+#!/bin/bash
+# ------------------------------------------------------------------
+# [gianc] parser
+#          Description
+# ------------------------------------------------------------------
+
+VERSION=0.1.0
+SUBJECT=parser
+
+USAGE="Usage: parser [list|details INCIDENT_ID]"
+
+# --- Options processing -------------------------------------------
+
+if [ $# == 0 ] ; then
+    echo $USAGE
+    exit 1;
+fi
+
+
+###########################################
+# set some variables
+source common_variables

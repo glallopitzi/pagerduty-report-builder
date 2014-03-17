@@ -1,0 +1,28 @@
+#!/bin/bash
+# ------------------------------------------------------------------
+# [gianc] common_variables
+#          Description
+# ------------------------------------------------------------------
+
+
+HEADER="Content-type: application/json"
+AUTH="support-247-onduty@jobrapido.com:j0br4p1d0"
+BASEURL="https://jobrapido.pagerduty.com/api/v1"
+TOKEN="Authorization: Token token=686362e923224b72bf4a30f73b0820c0"
+
+SINCE="--data-urlencode since=2014-02-10T17:00Z"
+UNTIL="--data-urlencode until=2014-02-17T10:00Z"
+SORT="--data-urlencode sort_by=incident_number:desc"
+
+OFFSET="--data-urlencode offset=100"
+LIMIT="--data-urlencode limit=100"
+
+FIELD="--data-urlencode fields=incident_number,created_on,status,assigned_to_user,id,trigger_summary_data"
+
+USERID="PE38H5L"
+INCIDENTID="PM7O5W8"
+
+TMP_GLOBAL_RESULT=global.result.json
+TMP_SINGLE_RESULT=single.result.json
+
+CSV_RESULT=report.csv
