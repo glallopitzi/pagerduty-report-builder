@@ -28,29 +28,29 @@ echo "SUBACTION" $SUBACTION
 # set some variables
 source common_variables
 
+# include parser
+source parser
+
+AUX_RESULT="aux.result.json"
+
+function getAllIncidentsNew {
+	writeLine
+	echo "getAllIncidents|BEGIN"
+	curl -H $HEADER --basic --user $AUTH -X GET -G $SINCE $UNTIL $FIELD $LIMIT $OFFSET $BASEURL/incidents > $AUX_RESULT
+
+	TOTAL=`cat $AUX_RESULT | ./jq '.total'`
+	
+
+
+	echo "getAllIncidents|END"
+}
+
 
 function getAllIncidents {
 	writeLine
 	echo "getting list of incidents.."
 	curl -H $HEADER --basic --user $AUTH -X GET -G $SINCE $UNTIL $FIELD $BASEURL/incidents > $TMP_GLOBAL_RESULT	
 	echo "list of incidents response saved in $TMP_GLOBAL_RESULT file"
-}
-
-function parseAllIncidents {
-	echo "try to parse list of incidents.."
-	hasMoreIncidents=0
-	index=0
-	while [ $index -le 200 ] && [ $hasMoreIncidents -eq 0 ]; do
-		ITEM=`cat $TMP_GLOBAL_RESULT | ./jq '.incidents['$index'].id'`
-		if [ "$ITEM" != '' ] && [ "$ITEM" != 'null' ]; then
-			echo "incident num $index id: $ITEM"
-
-		else
-			echo "no more incidents"
-			hasMoreIncidents=1
-		fi
-		index=$(( $index + 1 ))
-	done
 }
 
 function getSingleIncident {
@@ -60,28 +60,14 @@ function getSingleIncident {
 	echo "details response for incident with id: $1 saved in $TMP_SINGLE_RESULT file" 
 }
 
-function parseSingleIncident {
-	echo "try to parse singlo incident.."
-	hasMoreLogs=0
-	logIndex=0
-	while [ $logIndex -le 200 ] && [ $hasMoreLogs -eq 0 ]; do
-		ITEM=`cat $TMP_SINGLE_RESULT | ./jq '.log_entries['$logIndex'].type'`
-		if [ "$ITEM" != '' ] && [ "$ITEM" != 'null' ]; then
-			CREATEDON=`cat $TMP_SINGLE_RESULT | ./jq '.log_entries['$logIndex'].created_at'`
-			echo "log num $logIndex type: $ITEM at $CREATEDON"
-			
-		else
-			echo "no more logs"
-			hasMoreLogs=1
-		fi
-		logIndex=$(( $logIndex + 1 ))
-	done
-}
 
 
 
 
-
+if [ "$ACTION" = 'getAll' ]; then
+	getAllIncidents
+	writeLine
+fi
 
 
 if [ "$ACTION" = 'list' ]; then
