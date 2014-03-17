@@ -34,15 +34,29 @@ source parser
 AUX_RESULT="aux.result.json"
 
 function getAllIncidentsNew {
+	# params template
+	# OFFSET="--data-urlencode offset=0"
+	# LIMIT="--data-urlencode limit=100"
+
+	TOTAL_REQUESTED=0
+	INITIAL_LIMIT=100
+
 	writeLine
-	echo "getAllIncidents|BEGIN"
+	echo "getAllIncidentsNew|BEGIN"
 	curl -H $HEADER --basic --user $AUTH -X GET -G $SINCE $UNTIL $FIELD $LIMIT $OFFSET $BASEURL/incidents > $AUX_RESULT
-
 	TOTAL=`cat $AUX_RESULT | ./jq '.total'`
-	
 
+	echo "total incidents found: `cat $AUX_RESULT | ./jq '.total'`"
+	echo "offset resposne: `cat $AUX_RESULT | ./jq '.offset'`"
+	echo "limit response: `cat $AUX_RESULT | ./jq '.limit'`"
 
-	echo "getAllIncidents|END"
+	if [ $TOTAL -gt $INITIAL_LIMIT ]; then
+		cat $AUX_RESULT | ./jq '' >> temp.result.json
+		OFFSET="--data-urlencode offset=100"
+		curl -H $HEADER --basic --user $AUTH -X GET -G $SINCE $UNTIL $FIELD $LIMIT $OFFSET $BASEURL/incidents > $AUX_RESULT
+	fi
+
+	echo "getAllIncidentsNew|END"
 }
 
 
@@ -65,7 +79,7 @@ function getSingleIncident {
 
 
 if [ "$ACTION" = 'getAll' ]; then
-	getAllIncidents
+	getAllIncidentsNew
 	writeLine
 fi
 
@@ -86,7 +100,6 @@ if [ "$ACTION" = 'details' ] && [ "$SUBACTION" != '' ]; then
 	sleep 3
 	parseSingleIncident
 fi
-
 
 
 if [ "$ACTION" = 'report' ]; then
