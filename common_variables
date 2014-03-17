@@ -26,3 +26,14 @@ TMP_GLOBAL_RESULT=global.result.json
 TMP_SINGLE_RESULT=single.result.json
 
 CSV_RESULT=report.csv
+
+
+
+
+function writeLine { echo "-------------------------------------"; }
+
+function clean {
+	echo "cleaning.."
+	rm $TMP_GLOBAL_RESULT
+	rm $TMP_SINGLE_RESULT
+}

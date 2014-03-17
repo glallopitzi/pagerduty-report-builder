@@ -28,24 +28,15 @@ echo "SUBACTION" $SUBACTION
 source common_variables
 
 
-function clean {
-	echo "cleaning.."
-	rm $TMP_GLOBAL_RESULT
-	rm $TMP_SINGLE_RESULT
-}
-
-function writeLine { echo "-------------------------------------"; }
-
 function getAllIncidents {
 	writeLine
 	echo "getting list of incidents.."
 	curl -H $HEADER --basic --user $AUTH -X GET -G $SINCE $UNTIL $FIELD $BASEURL/incidents > $TMP_GLOBAL_RESULT	
-	sleep 3
-	echo ""
-	echo "try to parse response.."
+	echo "list of incidents response saved in $TMP_GLOBAL_RESULT file"
 }
 
 function parseAllIncidents {
+	echo "try to parse list of incidents.."
 	hasMoreIncidents=0
 	index=0
 	while [ $index -le 200 ] && [ $hasMoreIncidents -eq 0 ]; do
@@ -65,12 +56,11 @@ function getSingleIncident {
 	writeLine
 	echo "getting details for incident with id: $1" 
 	curl -H $HEADER --basic --user $AUTH -X GET -G $BASEURL/incidents/$1/log_entries > $TMP_SINGLE_RESULT
-	sleep 3
-	echo ""
-	echo "try to parse response.."
+	echo "details response for incident with id: $1 saved in $TMP_SINGLE_RESULT file" 
 }
 
 function parseSingleIncident {
+	echo "try to parse singlo incident.."
 	hasMoreLogs=0
 	logIndex=0
 	while [ $logIndex -le 200 ] && [ $hasMoreLogs -eq 0 ]; do
@@ -96,16 +86,17 @@ function parseSingleIncident {
 if [ "$ACTION" = 'list' ]; then
 	getAllIncidents
 	writeLine
+	sleep 3
 	parseAllIncidents
 	writeLine
 fi
 
 
-
-
 if [ "$ACTION" = 'details' ] && [ "$SUBACTION" != '' ]; then
 	INCIDENTID=$SUBACTION
 	getSingleIncident $INCIDENTID
+	writeLine
+	sleep 3
 	parseSingleIncident
 fi
 
