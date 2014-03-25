@@ -7,7 +7,7 @@
 VERSION=0.1.0
 SUBJECT=report_builder
 
-USAGE="Usage: report_builder [list|details INCIDENT_ID]"
+USAGE="Usage: report_builder [getAll|list|details INCIDENT_ID|report]"
 
 # --- Options processing -------------------------------------------
 
@@ -32,6 +32,7 @@ source common_variables
 source parser
 
 AUX_RESULT="aux.result.json"
+RESULT_INCIDENTS_ID="incidentsId.json"
 
 function getAllIncidentsNew {
 	# params template
@@ -42,19 +43,35 @@ function getAllIncidentsNew {
 	INITIAL_LIMIT=100
 
 	writeLine
-	echo "getAllIncidentsNew|BEGIN"
+	logMsg("getAllIncidentsNew|BEGIN")
+
 	curl -H $HEADER --basic --user $AUTH -X GET -G $SINCE $UNTIL $FIELD $LIMIT $OFFSET $BASEURL/incidents > $AUX_RESULT
+	
 	TOTAL=`cat $AUX_RESULT | ./jq '.total'`
+
+	TOTAL_REQ=`cat $AUX_RESULT | ./jq '.total'`
+	LIMIT_REQ=`cat $AUX_RESULT | ./jq '.limit'`
+	OFFSET_REQ=`cat $AUX_RESULT | ./jq '.offset'`
+
+	echo $((TOTAL_REQ - ( OFFSET_REQ + LIMIT_REQ )))
+	exit
+
+	TOTAL_REQUESTED = TOTAL_REQUESTED + 
+
+	cat $AUX_RESULT | ./jq '.incidents[].id' > $RESULT_INCIDENTS_ID
 
 	echo "total incidents found: `cat $AUX_RESULT | ./jq '.total'`"
 	echo "offset resposne: `cat $AUX_RESULT | ./jq '.offset'`"
 	echo "limit response: `cat $AUX_RESULT | ./jq '.limit'`"
 
-	if [ $TOTAL -gt $INITIAL_LIMIT ]; then
+
+	while [[ $TOTAL -gt $INITIAL_LIMIT ]]; do
+		logMsg("interation")
+
 		cat $AUX_RESULT | ./jq '' >> temp.result.json
 		OFFSET="--data-urlencode offset=100"
 		curl -H $HEADER --basic --user $AUTH -X GET -G $SINCE $UNTIL $FIELD $LIMIT $OFFSET $BASEURL/incidents > $AUX_RESULT
-	fi
+	done
 
 	echo "getAllIncidentsNew|END"
 }

@@ -28,7 +28,7 @@ TMP_SINGLE_RESULT=single.result.json
 CSV_RESULT=report.csv
 
 
-
+function logMsg { echo "$1"; }
 
 function writeLine { echo "-------------------------------------"; }
 
