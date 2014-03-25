@@ -27,6 +27,7 @@ TMP_SINGLE_RESULT=single.result.json
 
 CSV_RESULT=report.csv
 
+RESULT_INCIDENTS_ID="incidentsId.json"
 
 function logMsg { echo "$1"; }
 

@@ -31,48 +31,52 @@ source common_variables
 # include parser
 source parser
 
-AUX_RESULT="aux.result.json"
-RESULT_INCIDENTS_ID="incidentsId.json"
-
 function getAllIncidentsNew {
-	# params template
-	# OFFSET="--data-urlencode offset=0"
-	# LIMIT="--data-urlencode limit=100"
 
+	AUX_RESULT="aux.result.json"
+	
+	INCIDENTS_REMAINED=1000
 	TOTAL_REQUESTED=0
-	INITIAL_LIMIT=100
+	
+	LIMIT_KEY="--data-urlencode limit="
+	LIMIT_VALUE=100
+	ITERATION_LIMIT="$LIMIT_KEY$LIMIT_VALUE"
+
+	OFFSET_KEY="--data-urlencode offset="
+	OFFSET_VALUE=0
+	ITERATION_OFFSET="$OFFSET_KEY$OFFSET_VALUE"
 
 	writeLine
-	logMsg("getAllIncidentsNew|BEGIN")
+	logMsg "getAllIncidentsNew|BEGIN"
+	echo 
 
-	curl -H $HEADER --basic --user $AUTH -X GET -G $SINCE $UNTIL $FIELD $LIMIT $OFFSET $BASEURL/incidents > $AUX_RESULT
-	
-	TOTAL=`cat $AUX_RESULT | ./jq '.total'`
+	ITERATION_COUNTER=1
+	while [ $INCIDENTS_REMAINED -gt 0 ] && [ $ITERATION_COUNTER -lt 10 ]; do
+		writeLine
+		echo "interation $ITERATION_COUNTER BEGIN"
 
-	TOTAL_REQ=`cat $AUX_RESULT | ./jq '.total'`
-	LIMIT_REQ=`cat $AUX_RESULT | ./jq '.limit'`
-	OFFSET_REQ=`cat $AUX_RESULT | ./jq '.offset'`
+		curl -H $HEADER --basic --user $AUTH -X GET -G $SINCE $UNTIL $FIELD $ITERATION_LIMIT $ITERATION_OFFSET $BASEURL/incidents > $AUX_RESULT
 
-	echo $((TOTAL_REQ - ( OFFSET_REQ + LIMIT_REQ )))
-	exit
+		TOTAL_REQ=`cat $AUX_RESULT | ./jq '.total'`
+		LIMIT_REQ=`cat $AUX_RESULT | ./jq '.limit'`
+		OFFSET_REQ=`cat $AUX_RESULT | ./jq '.offset'`
 
-	TOTAL_REQUESTED = TOTAL_REQUESTED + 
+		logMsg "total req: $TOTAL_REQ"
+		logMsg "offset req: $OFFSET_REQ"
+		logMsg "limit req: $LIMIT_REQ"
 
-	cat $AUX_RESULT | ./jq '.incidents[].id' > $RESULT_INCIDENTS_ID
+		cat $AUX_RESULT | ./jq '.incidents[].id' >> $RESULT_INCIDENTS_ID
 
-	echo "total incidents found: `cat $AUX_RESULT | ./jq '.total'`"
-	echo "offset resposne: `cat $AUX_RESULT | ./jq '.offset'`"
-	echo "limit response: `cat $AUX_RESULT | ./jq '.limit'`"
+		writeLine
+		echo "interation $ITERATION_COUNTER END"
+		echo 
 
-
-	while [[ $TOTAL -gt $INITIAL_LIMIT ]]; do
-		logMsg("interation")
-
-		cat $AUX_RESULT | ./jq '' >> temp.result.json
-		OFFSET="--data-urlencode offset=100"
-		curl -H $HEADER --basic --user $AUTH -X GET -G $SINCE $UNTIL $FIELD $LIMIT $OFFSET $BASEURL/incidents > $AUX_RESULT
+		# some loop vars update
+		OFFSET_VALUE=$((OFFSET_VALUE + LIMIT_VALUE))
+		ITERATION_OFFSET="$OFFSET_KEY$OFFSET_VALUE"
+		ITERATION_COUNTER=$((ITERATION_COUNTER+1))
+		INCIDENTS_REMAINED=$((TOTAL_REQ - ( OFFSET_REQ + LIMIT_REQ )))
 	done
-
 	echo "getAllIncidentsNew|END"
 }
 
