@@ -41,7 +41,7 @@ function parseAllIncidents {
 
 
 function parseSingleIncident {
-	echo "try to parse singlo incident.."
+	echo "try to parse single incident.."
 	hasMoreLogs=0
 	logIndex=0
 	while [ $logIndex -le 200 ] && [ $hasMoreLogs -eq 0 ]; do
