@@ -95,12 +95,26 @@ function getSingleIncident {
 	echo "details response for incident with id: $1 saved in $TMP_SINGLE_RESULT file" 
 }
 
-
+function parseIncidentsIdList {
+	while read p; do
+		echo "elapsing incident with id: $p"
+		getSingleIncident $p
+		sleep 3
+		parseSingleIncident
+		echo "sleeping now.."
+		sleep 3
+	done < $RESULT_INCIDENTS_ID
+}
 
 
 
 if [ "$ACTION" = 'getAll' ]; then
 	getAllIncidentsNew
+	writeLine
+fi
+
+if [ "$ACTION" = 'parse' ]; then
+	parseIncidentsIdList
 	writeLine
 fi
 
