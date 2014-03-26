@@ -66,6 +66,7 @@ function getAllIncidentsNew {
 		logMsg "limit req: $LIMIT_REQ"
 
 		cat $AUX_RESULT | ./jq '.incidents[].id' >> $RESULT_INCIDENTS_ID
+		cat $AUX_RESULT | ./jq '.incidents[].incident_number' >> $RESULT_INCIDENTS_NUMBER
 
 		writeLine
 		echo "interation $ITERATION_COUNTER END"
@@ -77,6 +78,15 @@ function getAllIncidentsNew {
 		ITERATION_COUNTER=$((ITERATION_COUNTER+1))
 		INCIDENTS_REMAINED=$((TOTAL_REQ - ( OFFSET_REQ + LIMIT_REQ )))
 	done
+
+	echo
+	writeLine
+	echo "clean results.."
+	sed 's/\"//g' $RESULT_INCIDENTS_ID
+	sed 's/\"//g' $RESULT_INCIDENTS_NUMBER
+	writeLine
+	echo
+
 	echo "getAllIncidentsNew|END"
 }
 
@@ -95,12 +105,40 @@ function getSingleIncident {
 	echo "details response for incident with id: $1 saved in $TMP_SINGLE_RESULT file" 
 }
 
+
+function parseSingleIncidentNew {
+	echo "try to parse single incident NEW.."
+	hasMoreLogs=0
+	logIndex=0
+
+	# info to get from logs for each incident
+	INCIDENT_NUMBER=""
+	INCIDENT_HOST=""
+	ACK_ON=""
+	RESOLVED_OR_ESCALATED_ON=""
+
+	while [ $logIndex -ge 20 ] && [ $hasMoreLogs -eq 0 ]; do
+
+		ITEM=`cat $TMP_SINGLE_RESULT | ./jq '.log_entries['$logIndex'].type'`
+		
+		if [ "$ITEM" != '' ] && [ "$ITEM" != 'null' ]; then
+			CREATEDON=`cat $TMP_SINGLE_RESULT | ./jq '.log_entries['$logIndex'].created_at'`
+			echo "log num $logIndex type: $ITEM at $CREATEDON"
+			
+		else
+			echo "no more logs"
+			hasMoreLogs=1
+		fi
+		logIndex=$(( $logIndex + 1 ))
+	done
+}
+
 function parseIncidentsIdList {
 	while read p; do
 		echo "elapsing incident with id: $p"
 		getSingleIncident $p
 		sleep 3
-		parseSingleIncident
+		parseSingleIncidentNew
 		echo "sleeping now.."
 		sleep 3
 	done < $RESULT_INCIDENTS_ID
@@ -109,6 +147,7 @@ function parseIncidentsIdList {
 
 
 if [ "$ACTION" = 'getAll' ]; then
+	clean
 	getAllIncidentsNew
 	writeLine
 fi
