@@ -165,13 +165,17 @@ function parseSingleIncidentNew {
 		logIndex=$(( $logIndex + 1 ))
 	done
 
+	writeLine
 	echo "INCIDENT_NUMBER: $INCIDENT_NUMBER"
 	echo "INCIDENT_HOST: $INCIDENT_HOST"
 	echo "ACK_ON: $ACK_ON"
 	echo "RESOLVED_OR_ESCALATED_ON: $RESOLVED_OR_ESCALATED_ON"
 
 	echo "$INCIDENT_NUMBER|$INCIDENT_HOST|$ACK_ON|$RESOLVED_OR_ESCALATED_ON" >> $CSV_RESULT
-
+	writeLine
+	writeLine
+	echo
+	echo
 }
 
 function parseIncidentsIdList {
@@ -179,16 +183,25 @@ function parseIncidentsIdList {
 	while read p; do
 		q=`sed $INDEX'q;d' $RESULT_INCIDENTS_NUMBER`
 		echo "elapsing index: $INDEX, ID: $p"
+		
 		getSingleIncident $p
+		
+		echo "sleeping now.."
 		sleep 3
+
 		parseSingleIncidentNew $q
 		echo "sleeping now.."
 		sleep 3
+
 		INDEX=$((INDEX + 1))
 	done < $RESULT_INCIDENTS_ID
 }
 
-
+if [ "$ACTION" = 'clean' ]; then
+	writeLine
+	clean
+	writeLine
+fi
 
 if [ "$ACTION" = 'getAll' ]; then
 	clean

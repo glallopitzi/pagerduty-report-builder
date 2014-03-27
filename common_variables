@@ -35,10 +35,15 @@ function logMsg { echo "$1"; }
 function writeLine { echo "-------------------------------------"; }
 
 function clean {
+	echo
 	echo "cleaning.."
+	echo
+
 	rm $TMP_GLOBAL_RESULT
 	rm $TMP_SINGLE_RESULT
 
 	rm $RESULT_INCIDENTS_ID
 	rm $RESULT_INCIDENTS_NUMBER
+
+	rm $CSV_RESULT
 }
