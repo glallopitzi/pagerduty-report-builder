@@ -114,15 +114,25 @@ function parseSingleIncidentNew {
 	# info to get from logs for each incident
 	INCIDENT_NUMBER=""
 	INCIDENT_HOST=""
+	INCIDENT_HOST_FLAG=0
 	ACK_ON=""
 	RESOLVED_OR_ESCALATED_ON=""
 
-	while [ $logIndex -ge 20 ] && [ $hasMoreLogs -eq 0 ]; do
+	while [ $logIndex -lt 20 ] && [ $hasMoreLogs -eq 0 ]; do
 
 		ITEM=`cat $TMP_SINGLE_RESULT | ./jq '.log_entries['$logIndex'].type'`
 		
 		if [ "$ITEM" != '' ] && [ "$ITEM" != 'null' ]; then
 			CREATEDON=`cat $TMP_SINGLE_RESULT | ./jq '.log_entries['$logIndex'].created_at'`
+			
+			if [ $INCIDENT_HOST_FLAG -eq 0 ]; then
+				INCIDENT_HOST=`cat $TMP_SINGLE_RESULT | ./jq '.log_entries['$logIndex'].channel.summary'`
+				if [ "$INCIDENT_HOST" != '' ] && [ "$INCIDENT_HOST" != 'null' ]; then
+					INCIDENT_HOST_FLAG=1
+				fi
+			fi
+			
+
 			echo "log num $logIndex type: $ITEM at $CREATEDON"
 			
 		else
@@ -131,6 +141,9 @@ function parseSingleIncidentNew {
 		fi
 		logIndex=$(( $logIndex + 1 ))
 	done
+
+	echo "INCIDENT_HOST: $INCIDENT_HOST"
+
 }
 
 function parseIncidentsIdList {
