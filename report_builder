@@ -223,6 +223,26 @@ if [ "$ACTION" = 'list' ]; then
 	writeLine
 fi
 
+if [ "$ACTION" = 'setup' ] && [ "$SUBACTION" != '' ]; then
+	writeLine
+	case $SUBACTION in
+	    'linux' )
+			echo "linux setup"
+			cp bck/jq.linux jq
+	        ;;
+
+	    'osx' )
+			echo "osx setup"
+			cp bck/jq.osx jq
+	        ;;
+
+	    'win' )
+			echo "are you kidding me?"
+	        ;;
+	esac
+
+	writeLine
+fi
 
 if [ "$ACTION" = 'details' ] && [ "$SUBACTION" != '' ]; then
 	INCIDENTID=$SUBACTION
