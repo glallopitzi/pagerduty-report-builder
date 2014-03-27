@@ -204,18 +204,20 @@ if [ "$ACTION" = 'clean' ]; then
 fi
 
 if [ "$ACTION" = 'getAll' ]; then
-	clean
+	writeLine
 	getAllIncidentsNew
 	writeLine
 fi
 
 if [ "$ACTION" = 'parse' ]; then
+	writeLine
 	parseIncidentsIdList
 	writeLine
 fi
 
 
 if [ "$ACTION" = 'list' ]; then
+	writeLine
 	getAllIncidents
 	writeLine
 	sleep 3
@@ -240,16 +242,17 @@ if [ "$ACTION" = 'setup' ] && [ "$SUBACTION" != '' ]; then
 			echo "are you kidding me?"
 	        ;;
 	esac
-
 	writeLine
 fi
 
 if [ "$ACTION" = 'details' ] && [ "$SUBACTION" != '' ]; then
+	writeLine
 	INCIDENTID=$SUBACTION
 	getSingleIncident $INCIDENTID
 	writeLine
 	sleep 3
 	parseSingleIncident
+	writeLine
 fi
 
 

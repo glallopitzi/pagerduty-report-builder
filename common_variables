@@ -19,17 +19,18 @@ LIMIT="--data-urlencode limit=100"
 
 FIELD="--data-urlencode fields=incident_number,created_on,status,assigned_to_user,id,trigger_summary_data"
 
-USERID="PE38H5L"
-INCIDENTID="PM7O5W8"
+## local folders and paths
+BCK_FOLDER=bck
 
-TMP_GLOBAL_RESULT=global.result.json
-TMP_SINGLE_RESULT=single.result.json
+TMP_GLOBAL_RESULT=$BCK_FOLDER/global.result.json
+TMP_SINGLE_RESULT=$BCK_FOLDER/single.result.json
+
+RESULT_INCIDENTS_ID=$BCK_FOLDER/incidentsId.json
+RESULT_INCIDENTS_NUMBER=$BCK_FOLDER/incidentsNumber.json
 
 CSV_RESULT=report.csv
 
-RESULT_INCIDENTS_ID="incidentsId.json"
-RESULT_INCIDENTS_NUMBER="incidentsNumber.json"
-
+## common utilities methods
 function logMsg { echo "$1"; }
 
 function writeLine { echo "-------------------------------------"; }
