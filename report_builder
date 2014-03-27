@@ -113,10 +113,16 @@ function parseSingleIncidentNew {
 
 	# info to get from logs for each incident
 	INCIDENT_NUMBER=""
+	INCIDENT_NUMBER_FLAG=0
+
 	INCIDENT_HOST=""
 	INCIDENT_HOST_FLAG=0
+
 	ACK_ON=""
+	ACK_ON_FLAG=0
+
 	RESOLVED_OR_ESCALATED_ON=""
+	RESOLVED_OR_ESCALATED_ON_FLAG=0
 
 	while [ $logIndex -lt 20 ] && [ $hasMoreLogs -eq 0 ]; do
 
@@ -139,12 +145,18 @@ function parseSingleIncidentNew {
 
 			    'assign'|'acknowledge' )
 					#echo "found acknowledge"
-					ACK_ON=`cat $TMP_SINGLE_RESULT | ./jq '.log_entries['$logIndex'].created_at'`			        
+					if [ $ACK_ON_FLAG -eq 0 ]; then
+						ACK_ON=`cat $TMP_SINGLE_RESULT | ./jq '.log_entries['$logIndex'].created_at'`
+						ACK_ON_FLAG=1
+					fi
 			        ;;
 
-			    'escalated'|'resolved' )
+			    'escalate'|'resolve' )
 					#echo "found resolved or escalated"
-			        RESOLVED_OR_ESCALATED_ON=`cat $TMP_SINGLE_RESULT | ./jq '.log_entries['$logIndex'].created_at'`
+					if [ $RESOLVED_OR_ESCALATED_ON_FLAG -eq 0 ]; then
+						RESOLVED_OR_ESCALATED_ON=`cat $TMP_SINGLE_RESULT | ./jq '.log_entries['$logIndex'].created_at'`
+						RESOLVED_OR_ESCALATED_ON_FLAG=1
+					fi
 			        ;;
 			esac
 		else
@@ -157,6 +169,8 @@ function parseSingleIncidentNew {
 	echo "INCIDENT_HOST: $INCIDENT_HOST"
 	echo "ACK_ON: $ACK_ON"
 	echo "RESOLVED_OR_ESCALATED_ON: $RESOLVED_OR_ESCALATED_ON"
+
+	echo "###|$INCIDENT_HOST|$ACK_ON|$RESOLVED_OR_ESCALATED_ON" >> total.csv
 
 }
 
