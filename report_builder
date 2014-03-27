@@ -107,13 +107,12 @@ function getSingleIncident {
 
 
 function parseSingleIncidentNew {
-	echo "try to parse single incident NEW.."
+	echo "try to parse single incident with number: $1"
 	hasMoreLogs=0
 	logIndex=0
 
 	# info to get from logs for each incident
-	INCIDENT_NUMBER=""
-	INCIDENT_NUMBER_FLAG=0
+	INCIDENT_NUMBER=$1
 
 	INCIDENT_HOST=""
 	INCIDENT_HOST_FLAG=0
@@ -166,22 +165,26 @@ function parseSingleIncidentNew {
 		logIndex=$(( $logIndex + 1 ))
 	done
 
+	echo "INCIDENT_NUMBER: $INCIDENT_NUMBER"
 	echo "INCIDENT_HOST: $INCIDENT_HOST"
 	echo "ACK_ON: $ACK_ON"
 	echo "RESOLVED_OR_ESCALATED_ON: $RESOLVED_OR_ESCALATED_ON"
 
-	echo "###|$INCIDENT_HOST|$ACK_ON|$RESOLVED_OR_ESCALATED_ON" >> total.csv
+	echo "$INCIDENT_NUMBER|$INCIDENT_HOST|$ACK_ON|$RESOLVED_OR_ESCALATED_ON" >> $CSV_RESULT
 
 }
 
 function parseIncidentsIdList {
+	INDEX=1
 	while read p; do
-		echo "elapsing incident with id: $p"
+		q=`sed $INDEX'q;d' $RESULT_INCIDENTS_NUMBER`
+		echo "elapsing index: $INDEX, ID: $p"
 		getSingleIncident $p
 		sleep 3
-		parseSingleIncidentNew
+		parseSingleIncidentNew $q
 		echo "sleeping now.."
 		sleep 3
+		INDEX=$((INDEX + 1))
 	done < $RESULT_INCIDENTS_ID
 }
 
