@@ -7,7 +7,7 @@
 VERSION=0.1.0
 SUBJECT=report_builder
 
-USAGE="Usage: report_builder [getAll|list|details INCIDENT_ID|report]"
+USAGE="Usage: report_builder [getAll|parse|list|details INCIDENT_ID|setup ENV]"
 
 # --- Options processing -------------------------------------------
 
@@ -20,8 +20,8 @@ fi
 ACTION=$1
 SUBACTION=$2
 
-echo "ACTION" $ACTION
-echo "SUBACTION" $SUBACTION
+#echo "ACTION" $ACTION
+#echo "SUBACTION" $SUBACTION
 
 ###########################################
 
@@ -253,31 +253,5 @@ if [ "$ACTION" = 'details' ] && [ "$SUBACTION" != '' ]; then
 	sleep 3
 	parseSingleIncident
 	writeLine
-fi
-
-
-if [ "$ACTION" = 'report' ]; then
-	#getAllIncidents	
-	#writeLine
-	#sleep 3
-	hasMoreIncidents=0
-	index=0
-	while [ $index -le 1 ] && [ $hasMoreIncidents -eq 0 ]; do
-		INCIDENTID=`cat $TMP_GLOBAL_RESULT | ./jq '.incidents['$index'].id'`
-		if [ "$INCIDENTID" != '' ] && [ "$INCIDENTID" != 'null' ]; then
-			sleep 1
-			echo "trying to get details for incident number $index with id: $INCIDENTID"
-			writeLine
-			getSingleIncident $INCIDENTID
-			sleep 1
-			writeLine
-			parseSingleIncident
-			sleep 1
-		else
-			echo "no more incidents"
-			hasMoreIncidents=1
-		fi
-		index=$(( $index + 1 ))
-	done	
 fi
 
