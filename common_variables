@@ -10,8 +10,8 @@ AUTH="support-247-onduty@jobrapido.com:j0br4p1d0"
 BASEURL="https://jobrapido.pagerduty.com/api/v1"
 TOKEN="Authorization: Token token=686362e923224b72bf4a30f73b0820c0"
 
-SINCE="--data-urlencode since=2014-02-10T17:00Z"
-UNTIL="--data-urlencode until=2014-02-17T10:00Z"
+SINCE="--data-urlencode since=2014-03-17T17:00Z"
+UNTIL="--data-urlencode until=2014-03-27T10:00Z"
 SORT="--data-urlencode sort_by=incident_number:desc"
 
 OFFSET="--data-urlencode offset=0"
