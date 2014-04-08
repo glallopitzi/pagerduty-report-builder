@@ -5,6 +5,7 @@ simple bash scripts to use pagerduty api and build simple report
 
 steps:
 
+0. create your credentials file by moving and editing the template
 1. change date in common_variables
 2. "./report_builder getAll" to get the lists of incidents ids and numbers
 3. sanitize incidentsId.json removing dpouble quotes around ids
