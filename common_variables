@@ -5,10 +5,15 @@
 # ------------------------------------------------------------------
 
 
+CUSTOMER="your_customer"
+USER="your_user"
+PWD="your_pwd"
+USER_TOKEN="your_token"
+
 HEADER="Content-type: application/json"
-AUTH="support-247-onduty@jobrapido.com:j0br4p1d0"
-BASEURL="https://jobrapido.pagerduty.com/api/v1"
-TOKEN="Authorization: Token token=686362e923224b72bf4a30f73b0820c0"
+AUTH="$USER:$PWD"
+BASEURL="https://$CUSTOMER.pagerduty.com/api/v1"
+TOKEN="Authorization: Token token=$USER_TOKEN"
 
 SINCE="--data-urlencode since=2014-03-17T17:00Z"
 UNTIL="--data-urlencode until=2014-03-27T10:00Z"
