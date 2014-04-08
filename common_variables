@@ -4,11 +4,7 @@
 #          Description
 # ------------------------------------------------------------------
 
-
-CUSTOMER="your_customer"
-USER="your_user"
-PWD="your_pwd"
-USER_TOKEN="your_token"
+source credentials
 
 HEADER="Content-type: application/json"
 AUTH="$USER:$PWD"
