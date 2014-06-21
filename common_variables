@@ -29,6 +29,8 @@ TMP_SINGLE_RESULT=$BCK_FOLDER/single.result.json
 RESULT_INCIDENTS_ID=$BCK_FOLDER/incidentsId.json
 RESULT_INCIDENTS_NUMBER=$BCK_FOLDER/incidentsNumber.json
 
+AUX_RESULT="aux.result.json"
+
 CSV_RESULT=report.csv
 
 ## common utilities methods
@@ -47,5 +49,7 @@ function clean {
 	rm $RESULT_INCIDENTS_ID
 	rm $RESULT_INCIDENTS_NUMBER
 
+	rm $AUX_RESULT
+	
 	rm $CSV_RESULT
 }
