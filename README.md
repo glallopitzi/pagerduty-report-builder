@@ -20,6 +20,7 @@ usage
 * ./report\_builder getAll -> get all incidents between date in "common\_variables
 * ./report\_bluider clean -> clean all the temporary files
 * ./report\_builder details INCIDENT_ID get single incident details
+* ./report\_builder setup OS setup jq for given OS (linux or osx)
 
 
 references

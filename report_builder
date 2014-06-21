@@ -187,6 +187,10 @@ function parseIncidentsIdList {
 	done < $RESULT_INCIDENTS_ID
 }
 
+
+###########################################
+# MAIN CONTROLLER - BEGIN
+
 if [ "$1" = 'clean' ]; then
 	writeLine
 	clean

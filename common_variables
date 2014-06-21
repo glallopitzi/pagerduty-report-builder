@@ -50,6 +50,6 @@ function clean {
 	rm $RESULT_INCIDENTS_NUMBER
 
 	rm $AUX_RESULT
-	
+
 	rm $CSV_RESULT
 }
