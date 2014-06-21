@@ -99,7 +99,7 @@ function getSingleIncident {
 function parseSingleIncidentNew {
 	echo "try to parse single incident with number: $1"
 	hasMoreLogs=0
-	logIndex=0
+	logIndex=30
 
 	# info to get from logs for each incident
 	INCIDENT_NUMBER=$1
@@ -107,13 +107,27 @@ function parseSingleIncidentNew {
 	INCIDENT_HOST=""
 	INCIDENT_HOST_FLAG=0
 
-	ACK_ON=""
-	ACK_ON_FLAG=0
+	ASSIGNED_ON=""
+	ASSIGNED_ON_FLAG=0
+	ASSIGNED_TO=""
 
-	RESOLVED_OR_ESCALATED_ON=""
-	RESOLVED_OR_ESCALATED_ON_FLAG=0
+	ACKNOWLEDGED_ON=""
+	ACKNOWLEDGED_ON_FLAG=0
+	ACKNOWLEDGED_BY=""
 
-	while [ $logIndex -lt 20 ] && [ $hasMoreLogs -eq 0 ]; do
+	ANNOTATED_ON=""
+	ANNOTATED_ON_FLAG=0
+	ANNOTATED_WHAT=""
+
+	RESOLVED_ON=""
+	RESOLVED_ON_FLAG=0
+	RESOLVED_BY=""
+
+	ESCALATED_ON=""
+	ESCALATED_ON_FLAG=0
+	ESCALATED_TO=""
+
+	while [ $logIndex -ge 0 ] && [ $hasMoreLogs -eq 0 ]; do
 
 		ITEM=`cat $TMP_SINGLE_RESULT | ./jq '.log_entries['$logIndex'].type'`
 		
@@ -125,6 +139,7 @@ function parseSingleIncidentNew {
 			    'trigger' )
 					#echo "found trigger"
 					if [ $INCIDENT_HOST_FLAG -eq 0 ]; then
+						#echo "getting info for $ITEM event"
 						INCIDENT_HOST=`cat $TMP_SINGLE_RESULT | ./jq '.log_entries['$logIndex'].channel.summary'`
 						if [ "$INCIDENT_HOST" != '' ] && [ "$INCIDENT_HOST" != 'null' ]; then
 							INCIDENT_HOST_FLAG=1
@@ -132,36 +147,86 @@ function parseSingleIncidentNew {
 					fi        
 			        ;;
 
-			    'assign'|'acknowledge' )
-					#echo "found acknowledge"
-					if [ $ACK_ON_FLAG -eq 0 ]; then
-						ACK_ON=`cat $TMP_SINGLE_RESULT | ./jq '.log_entries['$logIndex'].created_at'`
-						ACK_ON_FLAG=1
+			    'assign' )
+					#echo "found assignment"
+					if [ $ASSIGNED_ON_FLAG -eq 0 ]; then
+						#echo "getting info for $ITEM event"
+						ASSIGNED_ON=`cat $TMP_SINGLE_RESULT | ./jq '.log_entries['$logIndex'].created_at'`
+						ASSIGNED_TO=`cat $TMP_SINGLE_RESULT | ./jq '.log_entries['$logIndex'].assigned_user.name'`
+						ASSIGNED_ON_FLAG=1
 					fi
 			        ;;
 
-			    'escalate'|'resolve' )
-					#echo "found resolved or escalated"
-					if [ $RESOLVED_OR_ESCALATED_ON_FLAG -eq 0 ]; then
-						RESOLVED_OR_ESCALATED_ON=`cat $TMP_SINGLE_RESULT | ./jq '.log_entries['$logIndex'].created_at'`
-						RESOLVED_OR_ESCALATED_ON_FLAG=1
+			    'acknowledge' )
+					#echo "found acknowledge"
+					if [ $ACKNOWLEDGED_ON_FLAG -eq 0 ]; then
+						#echo "getting info for $ITEM event"
+						ACKNOWLEDGED_ON=`cat $TMP_SINGLE_RESULT | ./jq '.log_entries['$logIndex'].created_at'`
+						ACKNOWLEDGED_BY=`cat $TMP_SINGLE_RESULT | ./jq '.log_entries['$logIndex'].agent.name'`
+						ACKNOWLEDGED_ON_FLAG=1
+					fi
+			        ;;
+
+				'annotate' )
+					#echo "found annotation"
+					if [ $ANNOTATED_ON_FLAG -eq 0 ]; then
+						#echo "getting info for $ITEM event"
+						ANNOTATED_ON=`cat $TMP_SINGLE_RESULT | ./jq '.log_entries['$logIndex'].created_at'`
+						ANNOTATED_WHAT=`cat $TMP_SINGLE_RESULT | ./jq '.log_entries['$logIndex'].channel.summary'`
+						ANNOTATED_ON_FLAG=1
+					fi
+			        ;;
+
+			    'escalate' )
+					#echo "found escalated"
+					if [ $ESCALATED_ON_FLAG -eq 0 ]; then
+						#echo "getting info for $ITEM event"
+						ESCALATED_ON=`cat $TMP_SINGLE_RESULT | ./jq '.log_entries['$logIndex'].created_at'`
+						ESCALATED_TO=`cat $TMP_SINGLE_RESULT | ./jq '.log_entries['$logIndex'].assigned_user.name'`
+						ESCALATED_ON_FLAG=1
+						RESOLVED_ON_FLAG=1
+					fi
+			        ;;
+
+			    'resolve' )
+					#echo "found resolved"
+					if [ $RESOLVED_ON_FLAG -eq 0 ]; then
+						#echo "getting info for $ITEM event"
+						RESOLVED_ON=`cat $TMP_SINGLE_RESULT | ./jq '.log_entries['$logIndex'].created_at'`
+						RESOLVED_TYPE=`cat $TMP_SINGLE_RESULT | ./jq '.log_entries['$logIndex'].agent.type'`
+						if [[ "$RESOLVED_TYPE" = '"user"' ]]; then
+							RESOLVED_BY=`cat $TMP_SINGLE_RESULT | ./jq '.log_entries['$logIndex'].agent.name'`
+						else
+							RESOLVED_BY="API"
+						fi
+						ESCALATED_ON_FLAG=1
+						RESOLVED_ON_FLAG=1
 					fi
 			        ;;
 			esac
-		else
-			#echo "no more logs"
-			hasMoreLogs=1
 		fi
-		logIndex=$(( $logIndex + 1 ))
+		logIndex=$(( $logIndex - 1 ))
 	done
 
 	writeLine
 	echo "INCIDENT_NUMBER: $INCIDENT_NUMBER"
 	echo "INCIDENT_HOST: $INCIDENT_HOST"
-	echo "ACK_ON: $ACK_ON"
-	echo "RESOLVED_OR_ESCALATED_ON: $RESOLVED_OR_ESCALATED_ON"
+	echo "ASSIGNED_ON: $ASSIGNED_ON -> to: $ASSIGNED_TO"
+	echo "ACKNOWLEDGED_ON: $ACKNOWLEDGED_ON -> by: $ACKNOWLEDGED_BY"
+	echo "ANNOTATED_ON: $ANNOTATED_ON -> what: $ANNOTATED_WHAT"
+	echo "RESOLVED_ON: $RESOLVED_ON -> by $RESOLVED_BY"
+	echo "ESCALATED_ON: $ESCALATED_ON -> to: $ESCALATED_TO"
 
-	echo "$INCIDENT_NUMBER|$INCIDENT_HOST|$ACK_ON|$RESOLVED_OR_ESCALATED_ON" >> $CSV_RESULT
+
+	if [ "$ASSIGNED_TO" != '' ] && [ "$ASSIGNED_TO" != 'null' ] && [ "$ASSIGNED_TO" = '"Support Member"' ]; then
+		if [ "$ESCALATED_ON" != '' ] && [ "$ESCALATED_ON" != 'null' ]; then
+			echo "$INCIDENT_NUMBER|$INCIDENT_HOST|$ACKNOWLEDGED_ON|$ESCALATED_ON|$ESCALATED_TO|$ANNOTATED_WHAT" >> $CSV_RESULT
+		else
+			echo "$INCIDENT_NUMBER|$INCIDENT_HOST|$ACKNOWLEDGED_ON|$RESOLVED_ON||$ANNOTATED_WHAT" >> $CSV_RESULT
+		fi
+	fi
+
+
 	writeLine
 	writeLine
 	echo
@@ -244,7 +309,7 @@ if [ "$1" = 'details' ] && [ "$2" != '' ]; then
 	getSingleIncident $2
 	writeLine
 	sleep 3
-	parseSingleIncident
+	parseSingleIncidentNew $2
 	writeLine
 fi
 
