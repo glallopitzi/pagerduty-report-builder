@@ -7,12 +7,13 @@ simple bash scripts to use pagerduty api and build simple report
 
 steps
 ----------
-0. create your credentials file by moving and editing the template
-1. change date in common_variables
-2. "./report_builder getAll" to get the lists of incidents ids and numbers
-3. sanitize incidentsId.json removing dpouble quotes around ids
-4. "./report_builder parse" to build report.csv
-5. import report.csv in an excel file and clean it
+1. ./report\_builder setup ENV, where ENV could be 'linux' or 'osx'
+2. create your credentials file by copying and editing the template credentials.tpl to credentials
+3. change data in common\_variables
+4. ./report\_builder getAll to get the lists of incidents ids and numbers
+5. sanitize incidentsId.json removing dpouble quotes around ids
+6. ./report\_builder parse to build report.csv
+7. import report.csv in an excel file and clean it 
 
 usage
 ----------

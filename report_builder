@@ -7,21 +7,13 @@
 VERSION=0.1.0
 SUBJECT=report_builder
 
-USAGE="Usage: report_builder [getAll|parse|list|details INCIDENT_ID|setup ENV]"
+USAGE="Usage: report_builder [getAll|parse|list|details INCIDENT_ID|setup ENV|clean]"
 
 # --- Options processing -------------------------------------------
-
 if [ $# == 0 ] ; then
     echo $USAGE
     exit 1;
 fi
-
-
-ACTION=$1
-SUBACTION=$2
-
-#echo "ACTION" $ACTION
-#echo "SUBACTION" $SUBACTION
 
 ###########################################
 
@@ -86,10 +78,11 @@ function getAllIncidentsNew {
 	sed 's/\"//g' $RESULT_INCIDENTS_NUMBER
 	writeLine
 	echo
+	
+	rm $AUX_RESULT
 
 	echo "getAllIncidentsNew|END"
 }
-
 
 function getAllIncidents {
 	writeLine
@@ -104,7 +97,6 @@ function getSingleIncident {
 	curl -H $HEADER --basic --user $AUTH -X GET -G $BASEURL/incidents/$1/log_entries > $TMP_SINGLE_RESULT
 	echo "details response for incident with id: $1 saved in $TMP_SINGLE_RESULT file" 
 }
-
 
 function parseSingleIncidentNew {
 	echo "try to parse single incident with number: $1"
@@ -197,26 +189,26 @@ function parseIncidentsIdList {
 	done < $RESULT_INCIDENTS_ID
 }
 
-if [ "$ACTION" = 'clean' ]; then
+if [ "$1" = 'clean' ]; then
 	writeLine
 	clean
 	writeLine
 fi
 
-if [ "$ACTION" = 'getAll' ]; then
+if [ "$1" = 'getAll' ]; then
 	writeLine
 	getAllIncidentsNew
 	writeLine
 fi
 
-if [ "$ACTION" = 'parse' ]; then
+if [ "$1" = 'parse' ]; then
 	writeLine
 	parseIncidentsIdList
 	writeLine
 fi
 
 
-if [ "$ACTION" = 'list' ]; then
+if [ "$1" = 'list' ]; then
 	writeLine
 	getAllIncidents
 	writeLine
@@ -225,9 +217,9 @@ if [ "$ACTION" = 'list' ]; then
 	writeLine
 fi
 
-if [ "$ACTION" = 'setup' ] && [ "$SUBACTION" != '' ]; then
+if [ "$1" = 'setup' ] && [ "$2" != '' ]; then
 	writeLine
-	case $SUBACTION in
+	case $2 in
 	    'linux' )
 			echo "linux setup"
 			cp bck/jq.linux jq
@@ -245,10 +237,9 @@ if [ "$ACTION" = 'setup' ] && [ "$SUBACTION" != '' ]; then
 	writeLine
 fi
 
-if [ "$ACTION" = 'details' ] && [ "$SUBACTION" != '' ]; then
+if [ "$1" = 'details' ] && [ "$2" != '' ]; then
 	writeLine
-	INCIDENTID=$SUBACTION
-	getSingleIncident $INCIDENTID
+	getSingleIncident $2
 	writeLine
 	sleep 3
 	parseSingleIncident
