@@ -11,9 +11,8 @@ steps
 2. create your credentials file by copying and editing the template credentials.tpl to credentials
 3. change data in common\_variables
 4. ./report\_builder getAll to get the lists of incidents ids and numbers
-5. sanitize incidentsId.json removing dpouble quotes around ids
-6. ./report\_builder parse to build report.csv
-7. import report.csv in an excel file and clean it 
+5. ./report\_builder parse to build report.csv
+6. import report.csv in an excel file and clean it 
 
 usage
 ----------
