@@ -55,7 +55,7 @@ function getAllIncidentsNew {
 		logMsg "offset req: $OFFSET_REQ"
 		logMsg "limit req: $LIMIT_REQ"
 
-		cat $AUX_RESULT | ./jq '.incidents[].id' >> $RESULT_INCIDENTS_ID
+		cat $AUX_RESULT | ./jq '.incidents[].id' | sed -e 's/^"//'  -e 's/"$//' >> $RESULT_INCIDENTS_ID
 		cat $AUX_RESULT | ./jq '.incidents[].incident_number' >> $RESULT_INCIDENTS_NUMBER
 
 		writeLine
