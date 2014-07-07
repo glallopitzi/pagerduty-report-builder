@@ -252,6 +252,15 @@ function parseIncidentsIdList {
 	done < $RESULT_INCIDENTS_ID
 }
 
+function getAllExtraHours {
+	echo "try to build extra hours number from report.csv file build before"
+	INDEX=1
+	while read p; do
+		echo "$INDEX, $p"
+
+		INDEX=$((INDEX + 1))
+	done < $CSV_RESULT
+}
 
 ###########################################
 # MAIN CONTROLLER - BEGIN
@@ -281,6 +290,12 @@ if [ "$1" = 'list' ]; then
 	writeLine
 	sleep 3
 	parseAllIncidents
+	writeLine
+fi
+
+if [ "$1" = 'report' ]; then
+	writeLine
+	getAllExtraHours
 	writeLine
 fi
 

@@ -11,8 +11,8 @@ AUTH="$USER:$PWD"
 BASEURL="https://$CUSTOMER.pagerduty.com/api/v1"
 TOKEN="Authorization: Token token=$USER_TOKEN"
 
-SINCE="--data-urlencode since=2014-06-21T04:00Z"
-UNTIL="--data-urlencode until=2014-06-21T10:00Z"
+SINCE="--data-urlencode since=2014-06-22T10:00Z"
+UNTIL="--data-urlencode until=2014-06-22T23:00Z"
 SORT="--data-urlencode sort_by=incident_number:desc"
 
 OFFSET="--data-urlencode offset=0"
